@@ -109,8 +109,12 @@ const Checkout = () => {
   const bookingMutation = useMutation({
     mutationFn: createBooking,
     onSuccess: () => {
-      toast.success("Booking confirmed!", { description: "A confirmation email has been sent." });
-      navigate("/");
+      // Save customer email to localStorage for future bookings
+      if (formData.email) {
+        localStorage.setItem("customerEmail", formData.email);
+      }
+      toast.success("Booking confirmed!", { description: "A confirmation email has been sent. You can now track your booking in 'My Bookings'." });
+      navigate("/my-bookings");
     },
     onError: (error) => {
       toast.error("Booking failed", { description: error.message });
@@ -138,7 +142,7 @@ const Checkout = () => {
     );
   }
 
-  // Require login before booking
+  // Require login before booking - but allow new customers to proceed
   if (!isLoggedIn) {
     return (
       <SiteLayout>
@@ -147,16 +151,16 @@ const Checkout = () => {
             <Card className="p-8 md:p-12">
               <div className="text-center mb-8">
                 <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <LogIn className="w-8 h-8 text-yellow-500" />
+                  <User className="w-8 h-8 text-yellow-500" />
                 </div>
-                <h1 className="font-serif text-3xl mb-3">Sign In Required</h1>
+                <h1 className="font-serif text-3xl mb-3">Welcome!</h1>
                 <p className="text-muted-foreground">
-                  Please sign in to your customer account to continue with your booking
+                  Sign in to continue or create a new account
                 </p>
               </div>
 
               <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-md p-6 mb-8">
-                <h3 className="font-medium mb-3">Why sign in?</h3>
+                <h3 className="font-medium mb-3">Benefits of having an account:</h3>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-yellow-600 mt-0.5 shrink-0" />
@@ -182,23 +186,33 @@ const Checkout = () => {
                   variant="hero" 
                   size="lg" 
                   className="w-full"
+                  onClick={() => {
+                    // Allow new customers to proceed without login
+                    // They will create account during checkout
+                    setIsLoggedIn(true);
+                  }}
+                >
+                  Continue as New Customer
+                </Button>
+                
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-border" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">Or</span>
+                  </div>
+                </div>
+
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  className="w-full"
                   onClick={() => navigate('/my-bookings', { state: { returnTo: `/checkout/${id}` } })}
                 >
                   <LogIn className="w-4 h-4 mr-2" />
-                  Sign In to Continue
+                  Sign In (Existing Customer)
                 </Button>
-                
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Don't have an account? Sign in with your email to create one automatically
-                  </p>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => navigate('/rooms')}
-                  >
-                    Back to Rooms
-                  </Button>
-                </div>
               </div>
 
               {/* Room Preview */}
@@ -462,7 +476,14 @@ const Checkout = () => {
             <div className="bg-card border border-border rounded-md p-8">
               {step === 0 && (
                 <>
-                  <h2 className="font-serif text-3xl mb-6">Guest details</h2>
+                  <div className="mb-6">
+                    <h2 className="font-serif text-3xl mb-2">Guest details</h2>
+                    {!customerData && (
+                      <p className="text-sm text-muted-foreground">
+                        Create your account by providing your details below
+                      </p>
+                    )}
+                  </div>
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div className="space-y-2">
                       <Label>First name *</Label>
@@ -474,6 +495,7 @@ const Checkout = () => {
                           const value = e.target.value.replace(/[^a-zA-Z\s]/g, '');
                           setFormData({...formData, firstName: value});
                         }}
+                        disabled={!!customerData}
                       />
                     </div>
                     <div className="space-y-2">
@@ -486,6 +508,7 @@ const Checkout = () => {
                           const value = e.target.value.replace(/[^a-zA-Z\s]/g, '');
                           setFormData({...formData, lastName: value});
                         }}
+                        disabled={!!customerData}
                       />
                     </div>
                     <div className="space-y-2 sm:col-span-2">
@@ -496,7 +519,13 @@ const Checkout = () => {
                         placeholder="you@example.com" 
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
+                        disabled={!!customerData}
                       />
+                      {!customerData && (
+                        <p className="text-xs text-muted-foreground">
+                          This email will be used to create your account and send booking confirmations
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-2 sm:col-span-2">
                       <Label>Phone *</Label>

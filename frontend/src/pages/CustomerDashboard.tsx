@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Calendar, CreditCard, User, Bell, LogOut, Clock, CheckCircle, XCircle } from "lucide-react";
+import { Calendar, CreditCard, User, Bell, LogOut, Clock, CheckCircle, XCircle, Phone, Mail, MapPin, FileText } from "lucide-react";
 import SiteLayout from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,9 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { getBookingsByEmail, getGuestByEmail, updateGuestProfile, cancelBooking } from "@/api/bookings.api";
-import type { Guest } from "@/types/database";
+import type { Guest, Booking } from "@/types/database";
 
 const CustomerDashboard = () => {
   const navigate = useNavigate();
@@ -19,6 +20,8 @@ const CustomerDashboard = () => {
   const queryClient = useQueryClient();
   const [customerEmail, setCustomerEmail] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   // Get return URL from location state
   const returnTo = (location.state as any)?.returnTo;
@@ -94,6 +97,29 @@ const CustomerDashboard = () => {
     }
   };
 
+  const viewBookingDetails = (booking: Booking) => {
+    setSelectedBooking(booking);
+    setShowDetailsModal(true);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', { 
+      weekday: 'long',
+      month: 'long', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+  };
+
+  const getPaymentMethodLabel = (method: string) => {
+    switch (method) {
+      case "telebirr": return "Telebirr";
+      case "bank": return "Bank Transfer";
+      case "hotel": return "Pay at Hotel";
+      default: return "Unknown";
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
       confirmed: "default",
@@ -104,11 +130,13 @@ const CustomerDashboard = () => {
   };
 
   const getPaymentBadge = (status: string) => {
-    return status === "paid" ? (
-      <Badge className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" /> Paid</Badge>
-    ) : (
-      <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" /> Pending</Badge>
-    );
+    if (status === "paid" || status === "verified") {
+      return <Badge className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" /> Paid</Badge>;
+    } else if (status === "failed") {
+      return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" /> Failed</Badge>;
+    } else {
+      return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" /> Pending</Badge>;
+    }
   };
 
   // Login form for customers
@@ -125,16 +153,37 @@ const CustomerDashboard = () => {
                 </p>
               </div>
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
                   if (customerEmail) {
-                    localStorage.setItem("customerEmail", customerEmail);
-                    setIsLoggedIn(true);
-                    toast.success("Logged in successfully");
-                    
-                    // Redirect to return URL if provided, otherwise stay on dashboard
-                    if (returnTo) {
-                      navigate(returnTo);
+                    try {
+                      // Validate email exists in database
+                      const guest = await getGuestByEmail(customerEmail);
+                      
+                      if (!guest) {
+                        toast.error("No account found with this email. Please make a booking first.");
+                        return;
+                      }
+
+                      // Check if guest has any bookings
+                      const guestBookings = await getBookingsByEmail(customerEmail);
+                      
+                      if (guestBookings.length === 0) {
+                        toast.error("No bookings found for this email. Please make a booking first.");
+                        return;
+                      }
+
+                      // Email is valid and has bookings
+                      localStorage.setItem("customerEmail", customerEmail);
+                      setIsLoggedIn(true);
+                      toast.success("Logged in successfully");
+                      
+                      // Redirect to return URL if provided, otherwise stay on dashboard
+                      if (returnTo) {
+                        navigate(returnTo);
+                      }
+                    } catch (error) {
+                      toast.error("Failed to verify email. Please try again.");
                     }
                   }
                 }}
@@ -155,7 +204,7 @@ const CustomerDashboard = () => {
                 </Button>
               </form>
               <p className="text-xs text-center text-muted-foreground mt-6">
-                Enter the email you used for booking
+                Enter the email you used for booking. Only registered guests can access the dashboard.
               </p>
             </Card>
           </div>
@@ -182,7 +231,6 @@ const CustomerDashboard = () => {
           </div>
         </div>
       </section>
-
       <section className="py-12">
         <div className="container">
           <Tabs defaultValue="bookings" className="space-y-8">
@@ -220,6 +268,26 @@ const CustomerDashboard = () => {
                               {getStatusBadge(booking.status)}
                               {getPaymentBadge(booking.payment_status)}
                             </div>
+
+                            {/* Status Explanation */}
+                            {booking.status === "pending" && (
+                              <div className="mb-3 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded-md">
+                                <p className="text-xs text-yellow-700 dark:text-yellow-600">
+                                  {booking.payment_status === 'pending' 
+                                    ? '⏳ Your booking is being reviewed. We will verify your payment and confirm within 24 hours.'
+                                    : '⏳ Payment verified! Your booking will be confirmed shortly.'}
+                                </p>
+                              </div>
+                            )}
+
+                            {booking.status === "confirmed" && (
+                              <div className="mb-3 p-2 bg-green-500/10 border border-green-500/20 rounded-md">
+                                <p className="text-xs text-green-700 dark:text-green-600">
+                                  ✓ Your booking is confirmed! We look forward to welcoming you.
+                                </p>
+                              </div>
+                            )}
+
                             <div className="grid sm:grid-cols-2 gap-2 text-sm text-muted-foreground">
                               <p>
                                 <strong>Booking ID:</strong> {booking.booking_id}
@@ -242,14 +310,24 @@ const CustomerDashboard = () => {
                           </div>
                           <div className="flex flex-col gap-2">
                             {booking.status === "confirmed" && (
-                              <Button variant="outline" size="sm">
+                              <Button variant="outline" size="sm" onClick={() => viewBookingDetails(booking)}>
                                 View Details
                               </Button>
                             )}
                             {booking.status === "pending" && (
                               <>
-                                <Button variant="outline" size="sm">
-                                  Complete Payment
+                                {booking.payment_status === 'pending' && booking.payment_method !== 'hotel' && (
+                                  <Button variant="outline" size="sm" disabled>
+                                    Payment Under Review
+                                  </Button>
+                                )}
+                                {booking.payment_status === 'verified' && (
+                                  <Button variant="outline" size="sm" disabled className="text-green-600">
+                                    Payment Verified ✓
+                                  </Button>
+                                )}
+                                <Button variant="outline" size="sm" onClick={() => viewBookingDetails(booking)}>
+                                  View Details
                                 </Button>
                                 <Button
                                   variant="destructive"
@@ -398,6 +476,175 @@ const CustomerDashboard = () => {
           </Tabs>
         </div>
       </section>
+
+      {/* Booking Details Modal */}
+      <Dialog open={showDetailsModal} onOpenChange={setShowDetailsModal}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-2xl">Booking Details</DialogTitle>
+            <DialogDescription>
+              Complete information about your reservation
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedBooking && (
+            <div className="space-y-6">
+              {/* Booking Status */}
+              <div className="flex items-center justify-between pb-4 border-b">
+                <div>
+                  <h3 className="font-semibold text-lg">{selectedBooking.booking_id}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Booked on {formatDate(selectedBooking.created_at || '')}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  {getStatusBadge(selectedBooking.status)}
+                  {getPaymentBadge(selectedBooking.payment_status)}
+                </div>
+              </div>
+
+              {/* Room Information */}
+              <div>
+                <h4 className="font-semibold mb-3 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
+                  Room Details
+                </h4>
+                <div className="bg-muted/30 p-4 rounded-md space-y-3">
+                  <div className="flex items-start gap-4">
+                    {selectedBooking.room?.image && (
+                      <img 
+                        src={selectedBooking.room.image} 
+                        alt={selectedBooking.room.name}
+                        className="w-24 h-24 object-cover rounded-md"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <h5 className="font-medium text-lg">{selectedBooking.room?.name || 'Room'}</h5>
+                      <p className="text-sm text-muted-foreground">{selectedBooking.room?.view}</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        <strong>Bed:</strong> {selectedBooking.room?.bed}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Stay Information */}
+              <div>
+                <h4 className="font-semibold mb-3 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
+                  Stay Information
+                </h4>
+                <div className="grid md:grid-cols-2 gap-4 text-sm bg-muted/30 p-4 rounded-md">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-yellow-600" />
+                    <div>
+                      <p className="text-muted-foreground">Check-in</p>
+                      <p className="font-medium">{formatDate(selectedBooking.check_in)}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-yellow-600" />
+                    <div>
+                      <p className="text-muted-foreground">Check-out</p>
+                      <p className="font-medium">{formatDate(selectedBooking.check_out)}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <User className="w-4 h-4 text-yellow-600" />
+                    <div>
+                      <p className="text-muted-foreground">Guests</p>
+                      <p className="font-medium">{selectedBooking.guests_count} people</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-yellow-600" />
+                    <div>
+                      <p className="text-muted-foreground">Total Amount</p>
+                      <p className="font-semibold text-yellow-600">ETB {selectedBooking.amount.toLocaleString()}</p>
+                    </div>
+                  </div>
+                  {selectedBooking.special_requests && (
+                    <div className="md:col-span-2 flex items-start gap-2">
+                      <FileText className="w-4 h-4 text-yellow-600 mt-0.5" />
+                      <div>
+                        <p className="text-muted-foreground">Special Requests</p>
+                        <p className="font-medium">{selectedBooking.special_requests}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Payment Information */}
+              <div>
+                <h4 className="font-semibold mb-3 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
+                  Payment Information
+                </h4>
+                <div className="bg-muted/30 p-4 rounded-md space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Payment Method:</span>
+                    <span className="font-medium">{getPaymentMethodLabel(selectedBooking.payment_method || '')}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Payment Status:</span>
+                    {getPaymentBadge(selectedBooking.payment_status)}
+                  </div>
+                  {selectedBooking.payment_status === 'pending' && (
+                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-md p-3 mt-3">
+                      <p className="text-sm text-yellow-600">
+                        ⏳ Your payment is being verified. We'll confirm your booking within 24 hours.
+                      </p>
+                    </div>
+                  )}
+                  {selectedBooking.payment_status === 'verified' && (
+                    <div className="bg-green-500/10 border border-green-500/30 rounded-md p-3 mt-3">
+                      <p className="text-sm text-green-600">
+                        ✓ Payment verified! Your booking is confirmed.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Contact Information */}
+              <div>
+                <h4 className="font-semibold mb-3 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
+                  Need Help?
+                </h4>
+                <div className="bg-muted/30 p-4 rounded-md space-y-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-yellow-600" />
+                    <span>Call us: +251 911 234 567</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-yellow-600" />
+                    <span>Email: info@yilmahotel.com</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              {selectedBooking.status === 'pending' && (
+                <div className="pt-4 border-t">
+                  <Button
+                    onClick={() => {
+                      setShowDetailsModal(false);
+                      handleCancelBooking(selectedBooking.id);
+                    }}
+                    variant="destructive"
+                    className="w-full"
+                  >
+                    Cancel This Booking
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </SiteLayout>
   );
 };

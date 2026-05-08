@@ -81,7 +81,7 @@ export const RoomForm = ({ room, onSubmit, onCancel, isSubmitting }: RoomFormPro
                 <Label>Room ID *</Label>
                 <Input
                   required
-                  placeholder="classic-king"
+                  // placeholder="classic-king"
                   value={formData.room_id}
                   onChange={(e) => setFormData({...formData, room_id: e.target.value})}
                   disabled={!!room}
@@ -91,7 +91,7 @@ export const RoomForm = ({ room, onSubmit, onCancel, isSubmitting }: RoomFormPro
                 <Label>Name *</Label>
                 <Input
                   required
-                  placeholder="Classic King"
+                  // placeholder="Classic King"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                 />
@@ -112,7 +112,7 @@ export const RoomForm = ({ room, onSubmit, onCancel, isSubmitting }: RoomFormPro
               <Label>Short Description *</Label>
               <Textarea
                 required
-                placeholder="A serene retreat with king bed..."
+                placeholder="A serene retreat with bed..."
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
                 rows={2}
@@ -123,7 +123,7 @@ export const RoomForm = ({ room, onSubmit, onCancel, isSubmitting }: RoomFormPro
               <Label>Long Description *</Label>
               <Textarea
                 required
-                placeholder="Our Classic King rooms balance..."
+                placeholder="Our rooms balance..."
                 value={formData.long_description}
                 onChange={(e) => setFormData({...formData, long_description: e.target.value})}
                 rows={3}
@@ -139,9 +139,17 @@ export const RoomForm = ({ room, onSubmit, onCancel, isSubmitting }: RoomFormPro
                   <Input
                     required
                     type="number"
-                    placeholder="189"
-                    value={formData.price}
-                    onChange={(e) => setFormData({...formData, price: Number(e.target.value)})}
+                    // placeholder="189"
+                    value={formData.price || ''}
+                    onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : Number(e.target.value);
+                      setFormData({...formData, price: value});
+                    }}
+                    onFocus={(e) => {
+                      if (e.target.value === '0') {
+                        e.target.select();
+                      }
+                    }}
                   />
                   {formData.price > 0 && (
                     <Button
@@ -162,9 +170,17 @@ export const RoomForm = ({ room, onSubmit, onCancel, isSubmitting }: RoomFormPro
                   <Input
                     required
                     type="number"
-                    placeholder="2"
-                    value={formData.guests}
-                    onChange={(e) => setFormData({...formData, guests: Number(e.target.value)})}
+                    // placeholder="2"
+                    value={formData.guests || ''}
+                    onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : Number(e.target.value);
+                      setFormData({...formData, guests: value});
+                    }}
+                    onFocus={(e) => {
+                      if (e.target.value === '0') {
+                        e.target.select();
+                      }
+                    }}
                   />
                   {formData.guests > 0 && (
                     <Button
@@ -185,9 +201,17 @@ export const RoomForm = ({ room, onSubmit, onCancel, isSubmitting }: RoomFormPro
                   <Input
                     required
                     type="number"
-                    placeholder="5"
-                    value={formData.available}
-                    onChange={(e) => setFormData({...formData, available: Number(e.target.value)})}
+                    // placeholder="5"
+                    value={formData.available || ''}
+                    onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : Number(e.target.value);
+                      setFormData({...formData, available: value});
+                    }}
+                    onFocus={(e) => {
+                      if (e.target.value === '0') {
+                        e.target.select();
+                      }
+                    }}
                   />
                   {formData.available > 0 && (
                     <Button
@@ -204,7 +228,7 @@ export const RoomForm = ({ room, onSubmit, onCancel, isSubmitting }: RoomFormPro
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            {/* <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>Bed Type *</Label>
                 <Input
@@ -232,7 +256,7 @@ export const RoomForm = ({ room, onSubmit, onCancel, isSubmitting }: RoomFormPro
                   onChange={(e) => setFormData({...formData, view: e.target.value})}
                 />
               </div>
-            </div>
+            </div> */}
 
             <div className="space-y-2">
               <Label>Amenities (comma-separated) *</Label>
@@ -254,7 +278,7 @@ export const RoomForm = ({ room, onSubmit, onCancel, isSubmitting }: RoomFormPro
                     step="0.1"
                     min="0"
                     max="5"
-                    placeholder="4.5"
+                    // placeholder="4.5"
                     value={formData.rating}
                     onChange={(e) => setFormData({...formData, rating: Number(e.target.value)})}
                   />
@@ -276,7 +300,7 @@ export const RoomForm = ({ room, onSubmit, onCancel, isSubmitting }: RoomFormPro
                 <div className="relative">
                   <Input
                     type="number"
-                    placeholder="0"
+                    // placeholder="0"
                     value={formData.reviews_count}
                     onChange={(e) => setFormData({...formData, reviews_count: Number(e.target.value)})}
                   />
@@ -322,7 +346,7 @@ export const RoomForm = ({ room, onSubmit, onCancel, isSubmitting }: RoomFormPro
               
               <p className="text-xs text-muted-foreground">Or enter URL manually:</p>
               <Input
-                placeholder="https://res.cloudinary.com/..."
+                // placeholder="https://res.cloudinary.com/..."
                 value={formData.image}
                 onChange={(e) => setFormData({...formData, image: e.target.value})}
               />
@@ -372,7 +396,7 @@ export const RoomForm = ({ room, onSubmit, onCancel, isSubmitting }: RoomFormPro
               
               <p className="text-xs text-muted-foreground">Or enter URLs manually (comma-separated):</p>
               <Textarea
-                placeholder="https://res.cloudinary.com/image1.jpg, https://res.cloudinary.com/image2.jpg"
+                // placeholder="https://res.cloudinary.com/image1.jpg, https://res.cloudinary.com/image2.jpg"
                 value={formData.gallery}
                 onChange={(e) => setFormData({...formData, gallery: e.target.value})}
                 rows={2}

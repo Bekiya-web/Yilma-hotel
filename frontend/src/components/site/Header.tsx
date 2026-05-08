@@ -138,10 +138,6 @@ const Header = () => {
                 Book Now
               </Button>
               <div className="relative group">
-                <Button variant="ghost" size="sm" className="hidden md:flex items-center gap-2">
-                  <User className="w-4 h-4" />
-                  <span className="text-xs">Account</span>
-                </Button>
                 <div className="absolute right-0 top-full mt-2 w-48 bg-card border border-border rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   <div className="p-2">
                     <div className="px-3 py-2 text-sm text-muted-foreground">
@@ -194,14 +190,26 @@ const Header = () => {
                 {item.label}
               </Link>
             ))}
-            {hasBookings && (
+            {customerEmail && hasBookings && (
               <Button asChild variant="outline" className="mt-2">
                 <Link to="/my-bookings">My Bookings</Link>
               </Button>
             )}
-            <Button onClick={handleBookNow} variant="hero">
-              Book Now
-            </Button>
+            {customerEmail ? (
+              <>
+                <Button onClick={handleBookNow} variant="hero">
+                  Book Now
+                </Button>
+                <Button onClick={handleLogout} variant="outline" className="gap-2">
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Button onClick={handleBookNow} variant="hero">
+                Book Now
+              </Button>
+            )}
           </nav>
         </div>
       )}

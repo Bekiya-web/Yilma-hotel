@@ -13,7 +13,8 @@ import {
   X,
   Bell,
   Search,
-  Image
+  Image,
+  Home
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -62,7 +63,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
             </button>
           </div>
 
-          <nav className="flex-1 p-4 space-y-2">
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             {navItems.map((item) => (
               <Link
                 key={item.path}
@@ -81,6 +82,16 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
           </nav>
 
           <div className="p-4 border-t border-border space-y-2">
+            {/* Back to Site Button - Always visible at bottom */}
+            <Link
+              to="/"
+              onClick={() => setSidebarOpen(false)}
+              className="flex items-center gap-3 px-4 py-3 rounded-lg bg-yellow-500 text-white hover:bg-yellow-600 transition-colors shadow-md font-medium"
+            >
+              <Home className="w-5 h-5" />
+              <span className="font-medium">Back to Site</span>
+            </Link>
+            
             <Link
               to="/admin/settings"
               onClick={() => setSidebarOpen(false)}
@@ -98,7 +109,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                 setSidebarOpen(false);
                 handleLogout();
               }}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground/70 hover:bg-yellow-500 hover:text-white transition-colors w-full text-left"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground/70 hover:bg-red-500 hover:text-white transition-colors w-full text-left"
             >
               <LogOut className="w-5 h-5" />
               <span className="font-medium">Logout</span>
@@ -126,6 +137,13 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
             </div>
 
             <div className="flex items-center gap-4">
+              {/* <Link
+                to="/"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-yellow-500 text-white hover:bg-yellow-600 transition-colors text-sm font-medium shadow-sm"
+              >
+                <Home className="w-4 h-4" />
+                <span className="hidden sm:inline">Back to Site</span>
+              </Link> */}
               <ThemeToggle />
               <button className="relative p-2 hover:bg-yellow-500 hover:text-white rounded-lg transition-colors">
                 <Bell className="w-5 h-5" />
@@ -145,7 +163,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         </header>
 
         {/* Page Content */}
-        <main className="p-6">
+        <main className="p-3 md:p-6">
           {children}
         </main>
       </div>

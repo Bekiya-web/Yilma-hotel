@@ -32,9 +32,15 @@ const AdminBookings = () => {
   const updateMutation = useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<Booking> }) => 
       updateBooking(id, updates),
-    onSuccess: () => {
+    onSuccess: (updatedBooking) => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+      
+      // Update the selected booking in the modal immediately
+      if (selectedBooking && updatedBooking) {
+        setSelectedBooking(updatedBooking);
+      }
+      
       toast.success("Booking updated successfully!");
     },
     onError: (error: Error) => {
@@ -296,6 +302,27 @@ const AdminBookings = () => {
                       <Eye className="w-4 h-4 mr-2" />
                       View Details
                     </Button>
+
+                    {/* Quick Verify Payment Button */}
+                    {booking.status === 'pending' && booking.payment_status === 'pending' && booking.payment_method !== 'hotel' && (
+                      <Button
+                        size="sm"
+                        variant="default"
+                        onClick={() => {
+                          updateMutation.mutate({ 
+                            id: booking.id, 
+                            updates: { 
+                              payment_status: 'verified'
+                            } 
+                          });
+                        }}
+                        disabled={updateMutation.isPending}
+                        className="flex-1 lg:w-40 bg-green-600 hover:bg-green-700"
+                      >
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Verify Payment
+                      </Button>
+                    )}
                     
                     <Select 
                       value={booking.status} 
@@ -603,10 +630,36 @@ const AdminBookings = () => {
                         )}
                       </div>
 
-                      {!selectedBooking.id_verified && (
+                      {!selectedBooking.id_verified && selectedBooking.status === 'pending' && (
                         <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-md p-3">
-                          <p className="text-sm text-yellow-600">
-                            ⚠️ ID verification pending. Please review the ID images before approving the booking.
+                          <p className="text-sm text-yellow-600 mb-3">
+                            ⚠️ ID verification pending. Please review the ID images above before approving the booking.
+                          </p>
+                          <Button
+                            onClick={() => {
+                              updateMutation.mutate({ 
+                                id: selectedBooking.id, 
+                                updates: { 
+                                  id_verified: true
+                                } 
+                              });
+                              toast.success("ID verified successfully!");
+                            }}
+                            disabled={updateMutation.isPending}
+                            size="sm"
+                            className="w-full bg-green-600 hover:bg-green-700"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Verify ID Documents
+                          </Button>
+                        </div>
+                      )}
+
+                      {selectedBooking.id_verified && (
+                        <div className="bg-green-500/10 border border-green-500/30 rounded-md p-3 text-center">
+                          <CheckCircle className="w-5 h-5 text-green-600 mx-auto mb-1" />
+                          <p className="text-sm text-green-600 font-medium">
+                            ID Documents Verified ✓
                           </p>
                         </div>
                       )}
@@ -617,25 +670,110 @@ const AdminBookings = () => {
                 {/* Action Buttons */}
                 {selectedBooking.status === 'pending' && (
                   <div className="space-y-3 pt-4 border-t">
-                    <div className="flex gap-3">
-                      <Button
-                        onClick={() => handleApprove(selectedBooking)}
-                        disabled={updateMutation.isPending}
-                        className="flex-1 bg-green-600 hover:bg-green-700"
-                      >
-                        <CheckCircle className="w-4 h-4 mr-2" />
-                        Approve Booking
-                      </Button>
-                      <Button
-                        onClick={() => handleReject(selectedBooking)}
-                        disabled={updateMutation.isPending}
-                        variant="destructive"
-                        className="flex-1"
-                      >
-                        <XCircle className="w-4 h-4 mr-2" />
-                        Reject Booking
-                      </Button>
+                    {/* Payment Verification Section - Only show if payment is pending */}
+                    {selectedBooking.payment_status === 'pending' && selectedBooking.payment_method !== 'hotel' && selectedBooking.payment_proof_url && (
+                      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-md p-4 mb-3">
+                        <h5 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
+                          Step 1: Verify Payment
+                        </h5>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Review the payment proof above and verify the payment.
+                        </p>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => {
+                              updateMutation.mutate({ 
+                                id: selectedBooking.id, 
+                                updates: { 
+                                  payment_status: 'verified'
+                                } 
+                              });
+                              toast.success("Payment verified successfully!");
+                            }}
+                            disabled={updateMutation.isPending}
+                            className="flex-1 bg-green-600 hover:bg-green-700"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Verify Payment
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              if (confirm("Are you sure you want to reject this payment?")) {
+                                updateMutation.mutate({ 
+                                  id: selectedBooking.id, 
+                                  updates: { 
+                                  payment_status: 'failed',
+                                    status: 'cancelled'
+                                  } 
+                                });
+                                toast.success("Payment rejected");
+                                setShowDetailsModal(false);
+                              }
+                            }}
+                            disabled={updateMutation.isPending}
+                            variant="destructive"
+                            className="flex-1"
+                          >
+                            <XCircle className="w-4 h-4 mr-2" />
+                            Reject Payment
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Payment Verified Confirmation */}
+                    {(selectedBooking.payment_status === 'verified' || selectedBooking.payment_method === 'hotel') && (
+                      <div className="bg-green-500/10 border border-green-500/30 rounded-md p-3 text-center mb-3">
+                        <CheckCircle className="w-5 h-5 text-green-600 mx-auto mb-1" />
+                        <p className="text-sm text-green-600 font-medium">
+                          {selectedBooking.payment_method === 'hotel' 
+                            ? 'Payment will be collected at hotel ✓' 
+                            : 'Payment Verified ✓'}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Final Approval Section */}
+                    <div className="bg-blue-500/10 border border-blue-500/30 rounded-md p-4 mb-3">
+                      <h5 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                        {(selectedBooking.payment_status === 'verified' || selectedBooking.payment_method === 'hotel') && selectedBooking.id_verified
+                          ? 'Step 2: Final Approval'
+                          : 'Final Step: Approve Booking'}
+                      </h5>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {!(selectedBooking.payment_status === 'verified' || selectedBooking.payment_method === 'hotel')
+                          ? '⚠️ Please verify payment first'
+                          : !selectedBooking.id_verified
+                          ? '⚠️ Please verify ID documents first'
+                          : 'All verifications complete. Ready to approve!'}
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => handleApprove(selectedBooking)}
+                          disabled={
+                            updateMutation.isPending || 
+                            !(selectedBooking.payment_status === 'verified' || selectedBooking.payment_method === 'hotel') ||
+                            !selectedBooking.id_verified
+                          }
+                          className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+                        >
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Approve & Confirm Booking
+                        </Button>
+                        <Button
+                          onClick={() => handleReject(selectedBooking)}
+                          disabled={updateMutation.isPending}
+                          variant="outline"
+                          className="flex-1 border-red-500 text-red-600 hover:bg-red-50"
+                        >
+                          <XCircle className="w-4 h-4 mr-2" />
+                          Reject Booking
+                        </Button>
+                      </div>
                     </div>
+
                     <Button
                       onClick={() => {
                         const email = selectedBooking.guest?.email;
