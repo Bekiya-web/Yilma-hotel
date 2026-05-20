@@ -204,10 +204,11 @@ const AdminDashboard = () => {
                   <Link
                     key={room.id}
                     to="/admin/rooms"
-                    className="flex-shrink-0 w-[calc(100vw-5rem)] md:w-auto snap-center flex items-center justify-between p-3 md:p-4 border border-yellow-500 rounded-lg hover:bg-yellow-500/10 transition-colors cursor-pointer"
+                    className="flex-shrink-0 w-[calc(100vw-5rem)] md:w-auto snap-center flex flex-col md:flex-row md:items-center md:justify-between p-3 md:p-4 border border-yellow-500 rounded-lg hover:bg-yellow-500/10 transition-colors cursor-pointer"
                   >
-                    <div className="flex items-center gap-3 md:gap-4 min-w-0 flex-1 mr-2">
-                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-card border border-border flex items-center justify-center flex-shrink-0">
+                    {/* Mobile: Image on top, Desktop: Icon on left */}
+                    <div className="flex md:items-center gap-3 md:gap-4 flex-col md:flex-row flex-1 min-w-0">
+                      <div className="w-full md:w-12 h-24 md:h-12 rounded-lg bg-card border border-border flex items-center justify-center flex-shrink-0">
                         <span className="font-semibold text-sm md:text-base">{room.room_number}</span>
                       </div>
                       <div className="min-w-0 flex-1">
@@ -217,7 +218,7 @@ const AdminDashboard = () => {
                         </p>
                       </div>
                     </div>
-                    <Badge className={`${getStatusColor(room.status)} text-xs flex-shrink-0`}>
+                    <Badge className={`${getStatusColor(room.status)} text-xs flex-shrink-0 mt-2 md:mt-0 self-start md:self-auto`}>
                       {room.status}
                     </Badge>
                   </Link>

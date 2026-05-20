@@ -123,11 +123,22 @@
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
     font-feature-settings: 'cv11', 'ss01';
+    overflow-x: hidden;
   }
 
   h1, h2, h3, h4, .font-serif {
     font-family: 'Cormorant Garamond', serif;
     letter-spacing: -0.01em;
+  }
+
+  /* Prevent horizontal overflow on mobile */
+  html {
+    overflow-x: hidden;
+  }
+
+  /* Ensure all containers respect viewport width */
+  .container {
+    max-width: 100%;
   }
 }
 

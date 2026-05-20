@@ -19,20 +19,20 @@ export const RoomCard = ({ room, onEdit, onDelete, isDeleting }: RoomCardProps) 
 
   return (
     <>
-      <Card className="p-6">
-        <div className="flex gap-6">
+      <Card className="p-4 md:p-6">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6">
           <img 
             src={room.image} 
             alt={room.name}
-            className="w-48 h-32 object-cover rounded-md"
+            className="w-full md:w-48 h-48 md:h-32 object-cover rounded-md"
           />
           <div className="flex-1">
-            <div className="flex items-start justify-between mb-2">
-              <div>
-                <h3 className="font-serif text-2xl">{room.name}</h3>
-                <p className="text-sm text-muted-foreground italic">{room.tagline}</p>
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-2 gap-3">
+              <div className="flex-1">
+                <h3 className="font-serif text-xl md:text-2xl">{room.name}</h3>
+                <p className="text-xs md:text-sm text-muted-foreground italic">{room.tagline}</p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-shrink-0">
                 <Button size="sm" variant="outline" onClick={() => setIsViewOpen(true)}>
                   <Eye className="w-4 h-4" />
                 </Button>
@@ -49,39 +49,39 @@ export const RoomCard = ({ room, onEdit, onDelete, isDeleting }: RoomCardProps) 
                 </Button>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground mb-4">{room.description}</p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4 line-clamp-2">{room.description}</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 text-xs md:text-sm">
               <div>
                 <span className="text-muted-foreground">Price:</span>
-                <span className="ml-2 font-semibold text-yellow-500">ETB {room.price.toLocaleString()}/night</span>
+                <span className="ml-1 md:ml-2 font-semibold text-yellow-500 block md:inline">ETB {room.price.toLocaleString()}/night</span>
               </div>
               <div>
                 <span className="text-muted-foreground">Bed:</span>
-                <span className="ml-2">{room.bed}</span>
+                <span className="ml-1 md:ml-2 block md:inline">{room.bed}</span>
               </div>
               <div>
                 <span className="text-muted-foreground">Size:</span>
-                <span className="ml-2">{room.size}</span>
+                <span className="ml-1 md:ml-2 block md:inline">{room.size}</span>
               </div>
               <div>
                 <span className="text-muted-foreground">Available:</span>
-                <span className="ml-2 font-semibold">{room.available} rooms</span>
+                <span className="ml-1 md:ml-2 font-semibold block md:inline">{room.available} rooms</span>
               </div>
               <div>
                 <span className="text-muted-foreground">Guests:</span>
-                <span className="ml-2">Up to {room.guests}</span>
+                <span className="ml-1 md:ml-2 block md:inline">Up to {room.guests}</span>
               </div>
               <div>
                 <span className="text-muted-foreground">Rating:</span>
-                <span className="ml-2">⭐ {room.rating} ({room.reviews_count})</span>
+                <span className="ml-1 md:ml-2 block md:inline">⭐ {room.rating} ({room.reviews_count})</span>
               </div>
               <div>
                 <span className="text-muted-foreground">View:</span>
-                <span className="ml-2">{room.view}</span>
+                <span className="ml-1 md:ml-2 block md:inline">{room.view}</span>
               </div>
               <div>
                 <span className="text-muted-foreground">ID:</span>
-                <span className="ml-2 text-xs">{room.room_id}</span>
+                <span className="ml-1 md:ml-2 text-xs block md:inline">{room.room_id}</span>
               </div>
             </div>
           </div>

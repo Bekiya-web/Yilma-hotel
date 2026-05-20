@@ -22,6 +22,7 @@ import AdminRevenue from "./pages/admin/Revenue.tsx";
 import AdminReviews from "./pages/admin/ReviewsAdmin.tsx";
 import AdminSettings from "./pages/admin/Settings.tsx";
 import AdminGallery from "./pages/admin/GalleryAdmin.tsx";
+import AdminLayout from "./components/admin/AdminLayout.tsx";
 
 const queryClient = new QueryClient();
 
@@ -47,14 +48,14 @@ const App = () => (
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/my-bookings" element={<CustomerDashboard />} />
           <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/bookings" element={<AdminBookings />} />
-          <Route path="/admin/rooms" element={<AdminRooms />} />
-          <Route path="/admin/guests" element={<AdminGuests />} />
-          <Route path="/admin/revenue" element={<AdminRevenue />} />
-          <Route path="/admin/reviews" element={<AdminReviews />} />
-          <Route path="/admin/gallery" element={<AdminGallery />} />
-          <Route path="/admin/settings" element={<AdminSettings />} />
+          <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
+          <Route path="/admin/bookings" element={<AdminLayout><AdminBookings /></AdminLayout>} />
+          <Route path="/admin/rooms" element={<AdminLayout><AdminRooms /></AdminLayout>} />
+          <Route path="/admin/guests" element={<AdminLayout><AdminGuests /></AdminLayout>} />
+          <Route path="/admin/revenue" element={<AdminLayout><AdminRevenue /></AdminLayout>} />
+          <Route path="/admin/reviews" element={<AdminLayout><AdminReviews /></AdminLayout>} />
+          <Route path="/admin/gallery" element={<AdminLayout><AdminGallery /></AdminLayout>} />
+          <Route path="/admin/settings" element={<AdminLayout><AdminSettings /></AdminLayout>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

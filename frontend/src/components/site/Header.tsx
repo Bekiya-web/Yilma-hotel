@@ -94,7 +94,7 @@ const Header = () => {
       <div className="container flex items-center justify-between h-20">
         <Logo />
 
-        <nav className="hidden lg:flex items-center gap-10">
+        <nav className="hidden lg:flex items-center gap-6">
           {navItems.map((item) => (
             <Link
               key={item.to}
@@ -110,7 +110,7 @@ const Header = () => {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <div className={scrolled || !isHome ? "" : "text-white drop-shadow-lg"}>
             <ThemeToggle />
           </div>
@@ -129,37 +129,17 @@ const Header = () => {
           {customerEmail ? (
             // User is logged in
             <div className="flex items-center gap-2">
-              {hasBookings && (
-                <Button asChild variant="outline" size="sm" className="hidden md:inline-flex">
-                  <Link to="/my-bookings">My Bookings</Link>
-                </Button>
-              )}
+              <Button asChild variant="outline" size="sm" className="hidden md:inline-flex">
+                <Link to="/my-bookings">
+                  My Bookings
+                </Link>
+              </Button>
               <Button onClick={handleBookNow} variant="hero" size="sm" className="hidden md:inline-flex">
                 Book Now
               </Button>
-              <div className="relative group">
-                <div className="absolute right-0 top-full mt-2 w-48 bg-card border border-border rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                  <div className="p-2">
-                    <div className="px-3 py-2 text-sm text-muted-foreground">
-                      <p className="font-medium truncate max-w-[150px]">{customerEmail}</p>
-                      <p className="text-xs text-muted-foreground/70">
-                        {hasBookings ? "Has bookings" : "No bookings yet"}
-                      </p>
-                    </div>
-                    <div className="border-t border-border">
-                      <Button
-                        onClick={handleLogout}
-                        variant="ghost"
-                        size="sm"
-                        className="w-full justify-start text-sm text-red-600 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <LogOut className="w-4 h-4 mr-2" />
-                        Logout
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <Button onClick={handleLogout} variant="ghost" size="sm" className="hidden md:inline-flex text-red-600 hover:text-red-700">
+                <LogOut className="w-4 h-4" />
+              </Button>
             </div>
           ) : (
             // User not logged in
@@ -190,9 +170,11 @@ const Header = () => {
                 {item.label}
               </Link>
             ))}
-            {customerEmail && hasBookings && (
+            {customerEmail && (
               <Button asChild variant="outline" className="mt-2">
-                <Link to="/my-bookings">My Bookings</Link>
+                <Link to="/my-bookings">
+                  My Bookings
+                </Link>
               </Button>
             )}
             {customerEmail ? (
@@ -200,7 +182,10 @@ const Header = () => {
                 <Button onClick={handleBookNow} variant="hero">
                   Book Now
                 </Button>
-                <Button onClick={handleLogout} variant="outline" className="gap-2">
+                <div className="text-xs text-muted-foreground px-2">
+                  Logged in as: {customerEmail}
+                </div>
+                <Button onClick={handleLogout} variant="outline" className="gap-2 text-red-600 hover:text-red-700">
                   <LogOut className="w-4 h-4" />
                   Logout
                 </Button>

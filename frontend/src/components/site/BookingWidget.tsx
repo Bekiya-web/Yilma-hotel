@@ -39,8 +39,8 @@ const BookingWidget = ({ variant = "hero" }: Props) => {
     label,
     children,
   }: { label: string; children: React.ReactNode }) => (
-    <div className="flex-1 min-w-0 px-5 py-3">
-      <p className="text-[10px] uppercase tracking-[0.2em] text-yellow-300 mb-1 font-semibold" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,0.9)' }}>{label}</p>
+    <div className="flex-1 min-w-0 px-3 md:px-5 py-2 md:py-3">
+      <p className="text-[9px] md:text-[10px] uppercase tracking-[0.15em] md:tracking-[0.2em] text-yellow-300 mb-0.5 md:mb-1 font-semibold" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,0.9)' }}>{label}</p>
       {children}
     </div>
   );
@@ -59,7 +59,7 @@ const BookingWidget = ({ variant = "hero" }: Props) => {
             <PopoverTrigger asChild>
               <button
                 className={cn(
-                  "w-full text-left flex items-center gap-2 text-base font-medium",
+                  "w-full text-left flex items-center gap-1.5 md:gap-2 text-sm md:text-base font-medium",
                   !checkIn && "opacity-70"
                 )}
                 style={{ 
@@ -67,7 +67,7 @@ const BookingWidget = ({ variant = "hero" }: Props) => {
                   textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,0.9)'
                 }}
               >
-                <CalendarIcon className="w-4 h-4" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.8))' }} />
+                <CalendarIcon className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.8))' }} />
                 {checkIn ? format(checkIn, "EEE, MMM d") : "Pick a date"}
               </button>
             </PopoverTrigger>
@@ -89,7 +89,7 @@ const BookingWidget = ({ variant = "hero" }: Props) => {
             <PopoverTrigger asChild>
               <button
                 className={cn(
-                  "w-full text-left flex items-center gap-2 text-base font-medium",
+                  "w-full text-left flex items-center gap-1.5 md:gap-2 text-sm md:text-base font-medium",
                   !checkOut && "opacity-70"
                 )}
                 style={{ 
@@ -97,7 +97,7 @@ const BookingWidget = ({ variant = "hero" }: Props) => {
                   textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,0.9)'
                 }}
               >
-                <CalendarIcon className="w-4 h-4" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.8))' }} />
+                <CalendarIcon className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.8))' }} />
                 {checkOut ? format(checkOut, "EEE, MMM d") : "Pick a date"}
               </button>
             </PopoverTrigger>
@@ -116,8 +116,8 @@ const BookingWidget = ({ variant = "hero" }: Props) => {
 
         <Field label="Guests">
           <Select value={guests} onValueChange={setGuests}>
-            <SelectTrigger className="border-0 p-0 h-auto bg-transparent text-base font-medium focus:ring-0 shadow-none" style={{ color: '#ffffff', textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,0.9)' }}>
-              <Users className="w-4 h-4 mr-2" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.8))' }} />
+            <SelectTrigger className="border-0 p-0 h-auto bg-transparent text-sm md:text-base font-medium focus:ring-0 shadow-none" style={{ color: '#ffffff', textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,0.9)' }}>
+              <Users className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 md:mr-2" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.8))' }} />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -130,7 +130,7 @@ const BookingWidget = ({ variant = "hero" }: Props) => {
 
         <Field label="Room type">
           <Select value={roomType} onValueChange={setRoomType}>
-            <SelectTrigger className="border-0 p-0 h-auto bg-transparent text-base font-medium focus:ring-0 shadow-none" style={{ color: '#ffffff', textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,0.9)' }}>
+            <SelectTrigger className="border-0 p-0 h-auto bg-transparent text-sm md:text-base font-medium focus:ring-0 shadow-none" style={{ color: '#ffffff', textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,0.9)' }}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -143,10 +143,11 @@ const BookingWidget = ({ variant = "hero" }: Props) => {
           </Select>
         </Field>
 
-        <div className="p-3 lg:w-56 flex">
-          <Button onClick={onSearch} variant="hero" size="xl" className="w-full gap-2">
-            <Search className="w-4 h-4" />
-            Check Availability
+        <div className="p-2 md:p-3 lg:w-56 flex">
+          <Button onClick={onSearch} variant="hero" size="lg" className="w-full gap-1.5 md:gap-2 text-sm md:text-base">
+            <Search className="w-3.5 h-3.5 md:w-4 md:h-4" />
+            <span className="hidden sm:inline">Check Availability</span>
+            <span className="sm:hidden">Search</span>
           </Button>
         </div>
       </div>

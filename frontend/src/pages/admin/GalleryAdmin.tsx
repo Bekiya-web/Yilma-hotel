@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2, Image as ImageIcon, Eye, EyeOff, X } from "lucide-react";
-import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -163,8 +162,7 @@ const GalleryAdmin = () => {
   ];
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -469,7 +467,6 @@ const GalleryAdmin = () => {
         </Card>
       )}
     </div>
-    </AdminLayout>
   );
 };
 

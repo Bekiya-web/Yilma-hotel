@@ -161,19 +161,11 @@ const CustomerDashboard = () => {
                       const guest = await getGuestByEmail(customerEmail);
                       
                       if (!guest) {
-                        toast.error("No account found with this email. Please make a booking first.");
+                        toast.error("No account found with this email. Please make a booking first to create an account.");
                         return;
                       }
 
-                      // Check if guest has any bookings
-                      const guestBookings = await getBookingsByEmail(customerEmail);
-                      
-                      if (guestBookings.length === 0) {
-                        toast.error("No bookings found for this email. Please make a booking first.");
-                        return;
-                      }
-
-                      // Email is valid and has bookings
+                      // Email is valid - allow login even without bookings
                       localStorage.setItem("customerEmail", customerEmail);
                       setIsLoggedIn(true);
                       toast.success("Logged in successfully");

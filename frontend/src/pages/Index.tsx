@@ -59,7 +59,7 @@ const Index = () => {
   return (
     <SiteLayout>
       {/* HERO */}
-      <section className="relative min-h-[100vh] flex items-end pb-20 pt-32 overflow-hidden">
+      <section className="relative min-h-[100vh] flex items-end pb-12 md:pb-20 pt-24 md:pt-32 overflow-hidden">
         <img
           src="/good.avif"
           alt="Auréa Grand luxury hotel exterior at dusk"
@@ -70,22 +70,22 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent dark:block hidden" />
 
         <div className="container relative z-10">
-          <div className="max-w-3xl mb-12 animate-fade-up">
-            <p className="text-xs uppercase tracking-[0.4em] text-yellow-400 mb-5 drop-shadow-lg">Five-star sanctuary</p>
-            <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl leading-[1.05] mb-6 text-white drop-shadow-2xl">
+          <div className="max-w-3xl mb-8 md:mb-12 animate-fade-up">
+            <p className="text-[10px] md:text-xs uppercase tracking-[0.3em] md:tracking-[0.4em] text-yellow-400 mb-3 md:mb-5 drop-shadow-lg">Five-star sanctuary</p>
+            <h1 className="font-serif text-3xl sm:text-4xl md:text-7xl lg:text-8xl leading-[1.1] md:leading-[1.05] mb-4 md:mb-6 text-white drop-shadow-2xl">
               Find & book your <em className="text-yellow-400 not-italic">perfect stay</em> in seconds.
             </h1>
-            <p className="text-lg text-white/90 max-w-xl leading-relaxed drop-shadow-lg">
+            <p className="text-sm md:text-lg text-white/90 max-w-xl leading-relaxed drop-shadow-lg">
               {hotelInfo?.description || "Experience luxury and comfort at YILMA HOTEL. Your perfect stay awaits in the heart of Addis Ababa. Real-time availability, instant confirmation, best price guaranteed."}
             </p>
           </div>
 
           <div className="animate-fade-up" style={{ animationDelay: "0.15s" }}>
             <BookingWidget />
-            <div className="flex flex-wrap gap-x-8 gap-y-2 mt-5 text-xs text-white/80">
+            <div className="flex flex-wrap gap-x-4 md:gap-x-8 gap-y-2 mt-3 md:mt-5 text-[10px] md:text-xs text-white/80">
               {trustItems.map((t) => (
-                <span key={t.label} className="flex items-center gap-2 drop-shadow-md">
-                  <t.icon className="w-4 h-4 text-yellow-400" /> {t.label}
+                <span key={t.label} className="flex items-center gap-1.5 md:gap-2 drop-shadow-md">
+                  <t.icon className="w-3 h-3 md:w-4 md:h-4 text-yellow-400" /> {t.label}
                 </span>
               ))}
             </div>
@@ -136,33 +136,43 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {modernFeatures.map((feature) => (
-              <div 
-                key={feature.title} 
-                className="group bg-card border border-border rounded-lg p-8 hover:border-yellow-500/50 hover:shadow-lg transition-all duration-300"
-              >
-                <div className="w-14 h-14 rounded-full bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center mb-5 group-hover:bg-yellow-500/20 transition-colors">
-                  <feature.icon className="w-6 h-6 text-yellow-600" />
+          {/* Desktop: Grid, Mobile: Horizontal Scroll */}
+          <div className="relative">
+            <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 overflow-x-auto md:overflow-visible scrollbar-hide snap-x snap-mandatory pb-4 -mx-4 px-4 md:mx-0 md:px-0">
+              {modernFeatures.map((feature) => (
+                <div 
+                  key={feature.title} 
+                  className="group bg-card border border-border rounded-lg p-6 md:p-8 hover:border-yellow-500/50 hover:shadow-lg transition-all duration-300 flex-shrink-0 w-[80vw] md:w-auto snap-center"
+                >
+                  <div className="w-14 h-14 rounded-full bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center mb-5 group-hover:bg-yellow-500/20 transition-colors">
+                    <feature.icon className="w-6 h-6 text-yellow-600" />
+                  </div>
+                  <h3 className="font-serif text-xl mb-2 group-hover:text-yellow-600 transition-colors">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{feature.text}</p>
                 </div>
-                <h3 className="font-serif text-xl mb-2 group-hover:text-yellow-600 transition-colors">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{feature.text}</p>
-              </div>
-            ))}
+              ))}
+            </div>
+            
+            {/* Scroll indicator for mobile */}
+            <div className="md:hidden flex justify-center gap-2 mt-4">
+              {modernFeatures.map((_, index) => (
+                <div key={index} className="w-2 h-2 rounded-full bg-yellow-500/30"></div>
+              ))}
+            </div>
           </div>
 
           <div className="mt-16 text-center">
-            <div className="inline-flex items-center gap-8 bg-card border border-border rounded-full px-8 py-4">
+            <div className="inline-flex flex-col sm:flex-row items-center gap-4 sm:gap-8 bg-card border border-border rounded-full px-6 sm:px-8 py-4">
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                 <span className="text-sm font-medium">Real-time availability</span>
               </div>
-              <div className="w-px h-6 bg-border" />
+              <div className="hidden sm:block w-px h-6 bg-border" />
               <div className="flex items-center gap-3">
                 <ShieldCheck className="w-4 h-4 text-yellow-600" />
                 <span className="text-sm font-medium">Secure booking</span>
               </div>
-              <div className="w-px h-6 bg-border" />
+              <div className="hidden sm:block w-px h-6 bg-border" />
               <div className="flex items-center gap-3">
                 <Sparkles className="w-4 h-4 text-yellow-600" />
                 <span className="text-sm font-medium">Instant confirmation</span>

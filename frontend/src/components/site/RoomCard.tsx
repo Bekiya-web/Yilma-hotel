@@ -15,11 +15,22 @@ const RoomCard = ({ room }: { room: Room }) => {
           className="w-full h-full object-cover group-hover:scale-105 transition-smooth duration-700"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-smooth" />
-        {room.available <= 3 && (
+        
+        {/* Availability Badge */}
+        {room.available === 0 ? (
+          <Badge className="absolute top-4 left-4 bg-destructive text-destructive-foreground border-0">
+            Fully Booked
+          </Badge>
+        ) : room.available <= 3 ? (
           <Badge className="absolute top-4 left-4 bg-destructive/90 text-destructive-foreground border-0 animate-shimmer">
             Only {room.available} left
           </Badge>
-        )}
+        ) : room.available <= 5 ? (
+          <Badge className="absolute top-4 left-4 bg-orange-500/90 text-white border-0">
+            {room.available} rooms left
+          </Badge>
+        ) : null}
+        
         <div className="absolute top-4 right-4 flex items-center gap-1 bg-background/80 backdrop-blur px-2.5 py-1 rounded-full text-xs">
           <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
           <span className="font-medium">{room.rating}</span>
@@ -47,10 +58,21 @@ const RoomCard = ({ room }: { room: Room }) => {
               ETB {room.price.toLocaleString()}
               <span className="text-sm text-muted-foreground font-sans"> / night</span>
             </p>
+            {room.available > 0 && room.available <= 10 && (
+              <p className="text-xs text-muted-foreground mt-1">
+                {room.available} room{room.available > 1 ? 's' : ''} available
+              </p>
+            )}
           </div>
-          <Button asChild variant="gold">
-            <Link to={`/rooms/${room.room_id}`}>Book Now</Link>
-          </Button>
+          {room.available === 0 ? (
+            <Button disabled variant="gold" className="opacity-50 cursor-not-allowed">
+              Fully Booked
+            </Button>
+          ) : (
+            <Button asChild variant="gold">
+              <Link to={`/rooms/${room.room_id}`}>Book Now</Link>
+            </Button>
+          )}
         </div>
       </div>
     </article>

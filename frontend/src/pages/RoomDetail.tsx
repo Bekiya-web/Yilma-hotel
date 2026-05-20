@@ -110,11 +110,21 @@ const RoomDetail = () => {
             {/* STICKY BOOKING SIDEBAR */}
             <aside className="lg:sticky lg:top-28 self-start">
               <div className="bg-card border border-border rounded-md shadow-elegant p-6">
-                {room.available <= 3 && (
-                  <Badge className="mb-4 bg-destructive/90 border-0 text-destructive-foreground">
-                    Only {room.available} rooms left
+                {/* Availability Badge */}
+                {room.available === 0 ? (
+                  <Badge className="mb-4 bg-destructive text-destructive-foreground border-0">
+                    Fully Booked
+                  </Badge>
+                ) : room.available <= 3 ? (
+                  <Badge className="mb-4 bg-destructive/90 border-0 text-destructive-foreground animate-shimmer">
+                    Only {room.available} room{room.available > 1 ? 's' : ''} left
+                  </Badge>
+                ) : (
+                  <Badge className="mb-4 bg-green-500/90 border-0 text-white">
+                    {room.available} rooms available
                   </Badge>
                 )}
+                
                 <p className="text-xs text-muted-foreground">From</p>
                 <p className="font-serif text-4xl text-yellow-600 mb-1">ETB {room.price.toLocaleString()}<span className="text-base text-muted-foreground font-sans"> / night</span></p>
                 <p className="text-xs text-muted-foreground mb-6">Taxes included · No hidden fees</p>
@@ -125,10 +135,23 @@ const RoomDetail = () => {
                   <div className="flex justify-between font-medium pt-2 text-base"><span>Total</span><span className="text-yellow-600">ETB {(room.price * 2).toLocaleString()}</span></div>
                 </div>
 
-                <Button onClick={() => navigate(`/checkout/${room.room_id}`)} variant="hero" size="xl" className="w-full mb-3">
-                  Book this room
-                </Button>
-                <p className="text-xs text-center text-muted-foreground">Free cancellation · Instant confirmation</p>
+                {room.available === 0 ? (
+                  <div className="space-y-3">
+                    <Button disabled variant="hero" size="xl" className="w-full opacity-50 cursor-not-allowed">
+                      Fully Booked
+                    </Button>
+                    <p className="text-xs text-center text-muted-foreground">
+                      This room type is currently unavailable. Please check other rooms or try different dates.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <Button onClick={() => navigate(`/checkout/${room.room_id}`)} variant="hero" size="xl" className="w-full mb-3">
+                      Book this room
+                    </Button>
+                    <p className="text-xs text-center text-muted-foreground">Free cancellation · Instant confirmation</p>
+                  </>
+                )}
 
                 <div className="mt-6 pt-6 border-t border-border space-y-2 text-xs text-muted-foreground">
                   <p className="flex items-center gap-2"><Eye className="w-3 h-3 text-yellow-600" /> 12 people viewing this room</p>

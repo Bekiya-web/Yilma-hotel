@@ -83,11 +83,16 @@ export const createBooking = async (booking: {
   // Get room to calculate amount
   const { data: room } = await supabase
     .from('rooms')
-    .select('price')
+    .select('price, available')
     .eq('id', booking.room_id)
     .single();
 
   if (!room) throw new Error('Room not found');
+  
+  // Check if room is available
+  if (room.available <= 0) {
+    throw new Error('This room type is fully booked. Please select another room or different dates.');
+  }
 
   // Calculate nights
   const checkIn = new Date(booking.check_in);
@@ -132,10 +137,29 @@ export const createBooking = async (booking: {
     .single();
   
   if (error) throw error;
+
+  // Decrease available room count
+  const { error: updateError } = await supabase
+    .from('rooms')
+    .update({ available: room.available - 1 })
+    .eq('id', booking.room_id);
+  
+  if (updateError) {
+    console.error('Error updating room availability:', updateError);
+    // Don't throw error here as booking is already created
+  }
+
   return data;
 };
 
 export const updateBooking = async (id: string, updates: Partial<Booking>) => {
+  // Get the current booking to check status changes
+  const { data: currentBooking } = await supabase
+    .from('bookings')
+    .select('status, room_id')
+    .eq('id', id)
+    .single();
+
   const { data, error } = await supabase
     .from('bookings')
     .update(updates)
@@ -148,16 +172,56 @@ export const updateBooking = async (id: string, updates: Partial<Booking>) => {
     .single();
   
   if (error) throw error;
+
+  // If status changed to cancelled, increase available room count
+  if (currentBooking && updates.status === 'cancelled' && currentBooking.status !== 'cancelled') {
+    const { data: room } = await supabase
+      .from('rooms')
+      .select('available')
+      .eq('id', currentBooking.room_id)
+      .single();
+
+    if (room) {
+      await supabase
+        .from('rooms')
+        .update({ available: room.available + 1 })
+        .eq('id', currentBooking.room_id);
+    }
+  }
+
   return data;
 };
 
 export const deleteBooking = async (id: string) => {
+  // Get the booking first to get room_id and status
+  const { data: booking } = await supabase
+    .from('bookings')
+    .select('room_id, status')
+    .eq('id', id)
+    .single();
+
   const { error } = await supabase
     .from('bookings')
     .delete()
     .eq('id', id);
   
   if (error) throw error;
+
+  // If booking was not cancelled, increase available room count
+  if (booking && booking.status !== 'cancelled') {
+    const { data: room } = await supabase
+      .from('rooms')
+      .select('available')
+      .eq('id', booking.room_id)
+      .single();
+
+    if (room) {
+      await supabase
+        .from('rooms')
+        .update({ available: room.available + 1 })
+        .eq('id', booking.room_id);
+    }
+  }
 };
 
 // Get bookings by guest email for customer dashboard
@@ -229,6 +293,16 @@ export const updateGuestProfile = async (email: string, updates: Partial<Guest>)
 
 // Cancel booking (customer-initiated)
 export const cancelBooking = async (bookingId: string) => {
+  // Get the booking first to get room_id
+  const { data: booking } = await supabase
+    .from('bookings')
+    .select('room_id, status')
+    .eq('id', bookingId)
+    .single();
+
+  if (!booking) throw new Error('Booking not found');
+
+  // Update booking status
   const { data, error } = await supabase
     .from('bookings')
     .update({ 
@@ -244,5 +318,26 @@ export const cancelBooking = async (bookingId: string) => {
     .single();
   
   if (error) throw error;
+
+  // If booking was not already cancelled, increase available room count
+  if (booking.status !== 'cancelled') {
+    const { data: room } = await supabase
+      .from('rooms')
+      .select('available')
+      .eq('id', booking.room_id)
+      .single();
+
+    if (room) {
+      const { error: updateError } = await supabase
+        .from('rooms')
+        .update({ available: room.available + 1 })
+        .eq('id', booking.room_id);
+      
+      if (updateError) {
+        console.error('Error updating room availability:', updateError);
+      }
+    }
+  }
+
   return data;
 };
