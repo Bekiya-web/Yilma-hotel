@@ -81,27 +81,27 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
             ))}
           </nav>
 
-          <div className="p-4 border-t border-border space-y-2">
+          <div className="p-3 md:p-4 border-t border-border space-y-1.5 md:space-y-2">
             {/* Back to Site Button - Always visible at bottom */}
             <Link
               to="/"
               onClick={() => setSidebarOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg bg-yellow-500 text-white hover:bg-yellow-600 transition-colors shadow-md font-medium"
+              className="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg bg-gradient-to-r from-yellow-500 to-yellow-600 text-white hover:from-yellow-600 hover:to-yellow-700 transition-all shadow-sm hover:shadow-md font-medium text-sm md:text-base"
             >
-              <Home className="w-5 h-5" />
+              <Home className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
               <span className="font-medium">Back to Site</span>
             </Link>
             
             <Link
               to="/admin/settings"
               onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+              className={`flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all text-sm md:text-base ${
                 isActive("/admin/settings")
-                  ? "bg-yellow-500 text-white"
-                  : "text-foreground/70 hover:bg-yellow-500 hover:text-white"
+                  ? "bg-yellow-500 text-white shadow-sm"
+                  : "text-foreground/70 hover:bg-muted hover:text-foreground"
               }`}
             >
-              <Settings className="w-5 h-5" />
+              <Settings className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
               <span className="font-medium">Settings</span>
             </Link>
             <button
@@ -109,9 +109,9 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                 setSidebarOpen(false);
                 handleLogout();
               }}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground/70 hover:bg-red-500 hover:text-white transition-colors w-full text-left"
+              className="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg text-foreground/70 hover:bg-red-50 dark:hover:bg-red-950 hover:text-red-600 dark:hover:text-red-400 transition-all w-full text-left text-sm md:text-base"
             >
-              <LogOut className="w-5 h-5" />
+              <LogOut className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
               <span className="font-medium">Logout</span>
             </button>
           </div>
