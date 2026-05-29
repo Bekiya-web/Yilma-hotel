@@ -74,7 +74,7 @@ export const getAllSettings = async () => {
 export const updateSettings = async <T>(key: SettingsKey, value: T) => {
   const { data, error } = await supabase
     .from('settings')
-    .update({ value: value as any })
+    .update({ value: value as unknown })
     .eq('key', key)
     .select()
     .single();

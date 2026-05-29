@@ -218,7 +218,7 @@ const GalleryAdmin = () => {
                 <Label>Category *</Label>
                 <Select
                   value={formData.category}
-                  onValueChange={(value: any) =>
+                  onValueChange={(value: "rooms" | "facilities" | "dining" | "events") =>
                     setFormData({ ...formData, category: value })
                   }
                 >

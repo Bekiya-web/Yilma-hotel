@@ -115,10 +115,10 @@ const AdminSettings = () => {
       // Reload settings to confirm save
       const updated = await getHotelInfo();
       if (updated) setHotelInfo(updated);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Save hotel info error:', error);
       toast.error("Failed to save hotel information", { 
-        description: error.message || 'Unknown error' 
+        description: error instanceof Error ? error.message : 'Unknown error' 
       });
     } finally {
       setIsSaving(false);
@@ -133,10 +133,10 @@ const AdminSettings = () => {
       // Reload settings to confirm save
       const updated = await getPaymentSettings();
       if (updated) setPaymentSettings(updated);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Save payment settings error:', error);
       toast.error("Failed to save payment settings", { 
-        description: error.message || 'Unknown error' 
+        description: error instanceof Error ? error.message : 'Unknown error' 
       });
     } finally {
       setIsSaving(false);
@@ -151,10 +151,10 @@ const AdminSettings = () => {
       // Reload settings to confirm save
       const updated = await getBookingSettings();
       if (updated) setBookingSettings(updated);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Save booking settings error:', error);
       toast.error("Failed to save booking settings", { 
-        description: error.message || 'Unknown error' 
+        description: error instanceof Error ? error.message : 'Unknown error' 
       });
     } finally {
       setIsSaving(false);
@@ -169,10 +169,10 @@ const AdminSettings = () => {
       // Reload settings to confirm save
       const updated = await getNotificationSettings();
       if (updated) setNotificationSettings(updated);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Save notification settings error:', error);
       toast.error("Failed to save notification settings", { 
-        description: error.message || 'Unknown error' 
+        description: error instanceof Error ? error.message : 'Unknown error' 
       });
     } finally {
       setIsSaving(false);
@@ -707,9 +707,9 @@ const AdminSettings = () => {
                 await changePassword(admin.email, passwordData.currentPassword, passwordData.newPassword);
                 toast.success("Password changed successfully!");
                 setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
-              } catch (error: any) {
+              } catch (error: unknown) {
                 toast.error("Failed to change password", { 
-                  description: error.message 
+                  description: error instanceof Error ? error.message : 'Unknown error' 
                 });
               } finally {
                 setIsChangingPassword(false);

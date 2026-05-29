@@ -35,7 +35,7 @@ const Rooms = () => {
     if (validPrices.length > 0) {
       setMaxPrice(maxRoomPrice);
     }
-  }, [maxRoomPrice]);
+  }, [maxRoomPrice, validPrices.length]);
 
   // Reset all filters
   const resetFilters = () => {

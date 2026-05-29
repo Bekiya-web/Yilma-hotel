@@ -12,7 +12,7 @@ import type { Room } from "@/types/database";
 
 interface RoomFormProps {
   room?: Room | null;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: Partial<Room>) => void;
   onCancel: () => void;
   isSubmitting: boolean;
 }

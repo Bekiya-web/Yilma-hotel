@@ -39,7 +39,7 @@ const AdminLogin = () => {
       await loginAdmin(email, password);
       toast.success("Login successful!");
       navigate("/admin");
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Login failed", { 
         description: error.message || "Invalid email or password" 
       });

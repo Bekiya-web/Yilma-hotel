@@ -24,7 +24,7 @@ const CustomerDashboard = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   // Get return URL from location state
-  const returnTo = (location.state as any)?.returnTo;
+  const returnTo = (location.state as { returnTo?: string })?.returnTo;
 
   // Fetch customer profile
   const { data: customerData, isLoading: profileLoading } = useQuery({

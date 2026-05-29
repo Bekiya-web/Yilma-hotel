@@ -440,8 +440,8 @@ const Checkout = () => {
         id_back_url: idBackResult.secure_url,
         selfie_url: selfieResult.secure_url
       });
-    } catch (error: any) {
-      toast.error("Failed to process booking", { description: error.message });
+    } catch (error: unknown) {
+      toast.error("Failed to process booking", { description: error instanceof Error ? error.message : 'Unknown error' });
     }
   };
 
@@ -647,7 +647,7 @@ const Checkout = () => {
                     {/* ID Type Selection */}
                     <div className="space-y-2 sm:col-span-2">
                       <Label>Select ID Type *</Label>
-                      <RadioGroup value={idType} onValueChange={(value: any) => setIdType(value)} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <RadioGroup value={idType} onValueChange={(value: string) => setIdType(value)} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <Label className="flex items-center gap-3 border border-border rounded-md p-4 cursor-pointer hover:border-yellow-500 transition-smooth">
                           <RadioGroupItem value="national_id" />
                           <div className="flex-1">

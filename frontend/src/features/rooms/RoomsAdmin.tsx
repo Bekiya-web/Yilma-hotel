@@ -63,7 +63,7 @@ const RoomsAdmin = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSubmit = (roomData: any) => {
+  const handleSubmit = (roomData: Partial<Room>) => {
     if (editingRoom) {
       updateMutation.mutate({ id: editingRoom.id, updates: roomData });
     } else {
